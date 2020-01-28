@@ -1,0 +1,9 @@
+git clone https://github.com/aholtzma/mpeg2dec.git
+
+cd mpeg2dec 
+
+./configure
+
+make
+
+./src/mpeg2dec test.m2v -o pgm

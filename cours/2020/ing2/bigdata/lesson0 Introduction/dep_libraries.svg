@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="105.69221mm"
+   height="34.121777mm"
+   viewBox="0 0 374.49995 120.90394"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="dep_libraries.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.8451024"
+     inkscape:cx="200.64356"
+     inkscape:cy="64.482738"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="2112"
+     inkscape:window-height="1404"
+     inkscape:window-x="48"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-131.74227,-732.12784)">
+    <rect
+       style="opacity:1;fill:#b4ffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.80253953;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4136-62-6-2"
+       width="184.02457"
+       height="25.962715"
+       x="320.88815"
+       y="732.52911" />
+    <g
+       id="g4330"
+       transform="matrix(1.0859864,0,0,0.99839627,-11.352961,-2.6469476)">
+      <rect
+         y="830.83289"
+         x="132.26521"
+         height="25.720316"
+         width="343.84775"
+         id="rect4136"
+         style="opacity:1;fill:#96ff64;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4138"
+         y="848.94305"
+         x="274.1391"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="848.94305"
+           x="274.1391"
+           id="tspan4140"
+           sodipodi:role="line"
+           style="font-size:20px;line-height:1.25">Python</tspan></text>
+    </g>
+    <rect
+       style="opacity:1;fill:#ff8c46;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.86979949;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4136-6"
+       width="171.50424"
+       height="25.946312"
+       x="133.05838"
+       y="795.18549" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.04334164px;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.0036118px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="196.18964"
+       y="815.71674"
+       id="text4138-7"
+       transform="scale(1.0037515,0.99626253)"><tspan
+         sodipodi:role="line"
+         id="tspan4140-5"
+         x="196.18964"
+         y="815.71674"
+         style="font-size:20.07223511px;line-height:1.25;stroke-width:1.0036118px">Numpy</tspan></text>
+    <g
+       id="g4319"
+       transform="translate(-54.375,-1.6753586)">
+      <g
+         id="g4314">
+        <rect
+           style="opacity:1;fill:#b4ffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="rect4136-62"
+           width="113.56903"
+           height="26.266048"
+           x="362.591"
+           y="797.00995" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="369.45551"
+           y="815.42297"
+           id="text4138-9"><tspan
+             style="font-size:20px;line-height:1.25"
+             sodipodi:role="line"
+             id="tspan4140-1"
+             x="369.45551"
+             y="815.42297">Matplotlib</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g155">
+      <rect
+         y="732.52911"
+         x="134.18121"
+         height="25.962715"
+         width="184.02455"
+         id="rect4136-62-6"
+         style="opacity:1;fill:#b4ffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.80253947;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4138-9-1"
+         y="752.31049"
+         x="191.32349"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="752.31049"
+           x="191.32349"
+           id="tspan4140-1-8"
+           sodipodi:role="line"
+           style="font-size:20px;line-height:1.25">Seaborn</tspan></text>
+    </g>
+    <g
+       id="g4304"
+       transform="translate(-54.115479,1.1137633)">
+      <rect
+         y="762.51154"
+         x="187.44705"
+         height="26.286623"
+         width="109.64611"
+         id="rect4136-6-2"
+         style="opacity:1;fill:#ffff96;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4138-7-7"
+         y="780.67487"
+         x="217.11011"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-size:20px;line-height:1.25"
+           y="780.67487"
+           x="217.11011"
+           id="tspan4140-5-0"
+           sodipodi:role="line">Scipy</tspan></text>
+    </g>
+    <g
+       id="g4299"
+       transform="translate(-54.375031,0.80477282)">
+      <rect
+         y="762.94183"
+         x="300.64859"
+         height="26.044008"
+         width="175.41666"
+         id="rect4136-62-9"
+         style="opacity:1;fill:#ff8c46;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4138-9-3"
+         y="782.78381"
+         x="358.28693"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-size:20px;line-height:1.25"
+           y="782.78381"
+           x="358.28693"
+           id="tspan4140-1-6"
+           sodipodi:role="line">Pandas</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.00000012px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="369.97543"
+       y="752.87299"
+       id="text4138-9-1-6"><tspan
+         style="font-size:20px;line-height:1.25;stroke-width:1.00000012px"
+         sodipodi:role="line"
+         x="369.97543"
+         y="752.87299"
+         id="tspan97">Cufflinks</tspan></text>
+    <g
+       id="g4668">
+      <rect
+         y="763.6413"
+         x="425.41513"
+         height="57.961624"
+         width="79.754288"
+         id="rect4136-62-6-3-5"
+         style="opacity:1;fill:#b4ffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.9375;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4138-9-1-6-3"
+         y="797.82208"
+         x="434.95227"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:0%;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.00000012px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           id="tspan97-5"
+           y="797.82208"
+           x="434.95227"
+           sodipodi:role="line"
+           style="font-size:20px;line-height:1.25;stroke-width:1.00000012px">Plotly</tspan></text>
+    </g>
+  </g>
+</svg>

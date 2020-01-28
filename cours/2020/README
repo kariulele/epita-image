@@ -1,0 +1,72 @@
+Tout les documents et les cours pris par les 2020.
+Les hackmd ont tous ete convertis en pdf.
+Cependant, le masterpost est ici si vous voulez les reprendre :
+https://hackmd.io/K7-1KFzcRwWrxfhvN74sTg
+
+Voila les matieres par annee et par module. Si une matiere n'as pas de dossier
+c'est normalement parce que c'etait des projets ou des tps uniquement. 
+Il peut y avoir des oublies, n'hesitez pas a le signaler.
+
+2020 :
+    ING2 :
+        algorep             -> projet
+        ando                -> partiel
+        bigdata             -> exam machine
+        sapy                -> exam en cours
+        iren                -> projet
+
+        tifo                -> exam machine et qcm
+        moma                -> partiel
+        imed                -> projet
+        its1                -> partiel
+        mlrf                -> tp (1 par semaine)
+        imco                -> presentation d'article
+        ailes d'abeilles    -> projet
+        kprat               -> presentation d'article
+
+        gpgpu               -> projet
+        pogl                -> projet
+        isim                -> projet
+
+        ocvx                -> partiel
+        prst                -> partiel
+        tec1                -> partiel
+
+        ddtr                -> partiel
+        un electif          -> depend de l'electif
+
+        enac
+
+    ING3 :
+        cmkv                -> projet
+        dvirt               -> qcm (3, a la fin des cours) + projet
+        pfee                -> projet
+        sapy2               -> partiel
+        perv                -> presentation d'article
+        rnti                -> projet
+        msc                 -> wargame
+
+        tnsi                -> tps (2)
+        tia                 -> projet
+        imed2               -> ?
+        vpo                 -> tps (3, un par cours)
+        tvid                -> tps (2)
+        tsa                 -> partiel
+
+        rvau                -> projet
+        an3d                -> projet
+        pogla               -> projet
+
+        mineure             -> depend de la mineure
+
+    RDI :
+        ING2 : les memes cours a part: iren, enac et algorep qui sautent, et kprat et
+        moma qui sont remplaces.
+        ING3 : pfee qui saute.
+
+J'ai la majorite des projets de fait, je peux aider si vous avez besoin.
+mail : ellena.davoine@epita.fr
+
+site : http://epita-image.alwaysdata.net
+
+AUTHORS : bjorn-grape, Elllundril

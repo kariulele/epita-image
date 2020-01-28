@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!-- saved from url=(0080)https://www.lrde.epita.fr/~jchazalo/teaching/DVIRT19/practice01/indications.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Joseph Chazalon, Clément Demoulins {firstname.lastname@lrde.epita.fr}">
+  <title>Deployment and virtualization, practice session 1</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Deployment and virtualization, practice session 1</h1>
+<p class="author">Joseph Chazalon, Clément Demoulins {firstname.lastname@lrde.epita.fr}</p>
+<p class="date">October’19</p>
+</header>
+<h2 id="introduction">Introduction</h2>
+<p>This first session about Docker will help you getting started. It will focus on using Docker’s command line API without writing <em>Dockerfiles</em>; this will be covered in the next session.</p>
+<p>After having checked your Docker installation, we will cover the following aspects:</p>
+<ol type="1">
+<li>container life cycle;</li>
+<li>images versus containers, and how to manage them;</li>
+<li>data persistence.</li>
+</ol>
+<p>All actions you need to perform are indicated by the following pictogram: <img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"></p>
+<p>Make sure you read and understand all the material of this document, and go through all the required actions.</p>
+<p><strong>Also, be sure to keep notes about what you are doing, as you will have to answer graded questions about your work during the last 15 minutes of the session.</strong></p>
+<h2 id="step-0-check-docker-is-properly-installed-and-running">Step 0: Check Docker is properly installed and running</h2>
+<h3 id="installation-boot">Installation / Boot</h3>
+<ul>
+<li>If you work on <strong>your personal computer</strong>:
+<ul>
+<li>If Docker is not already installed on your computer, then make sure you do not spend more than 15 minutes to get it up and running.</li>
+<li>You can go to the <a href="https://docs.docker.com/install/">online documentation</a> and follow the instruction to install Docker <em>Community Edition</em> (CE) – this is the free version of Docker.</li>
+<li>Our experience shows that installing the official Docker repositories was easy and efficient.</li>
+<li>After installing Docker on Linux, make sure your add your current user to the <code>docker</code> group.<br>
+If you do so, make sure you do not forget the <code>-a</code> in <code>usermod -a -G docker $USER</code>.<br>
+To avoid restarting your session, just log into the <code>docker</code> group with <code>newgrp docker</code>.</li>
+</ul></li>
+<li>If you work on <strong>school’s computers</strong>:
+<ul>
+<li>Make sure you use the <strong>FIXME name</strong> image to boot.</li>
+</ul></li>
+</ul>
+<h3 id="security-reminder">Security reminder</h3>
+<p>Up to now, being able to use Docker required to have <strong>root-equivalent powers</strong> on the host machine.</p>
+<p>This is the reason the Docker-capable images used at school are restricted, and may not mount your AFS automatically.</p>
+<h3 id="get-information-about-the-docker-installation">Get information about the Docker installation</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Run the following command in a terminal to get information about your Docker installation:</p>
+<pre class=".{shell}"><code>$ docker info</code></pre>
+<h3 id="test-run">Test run</h3>
+<p>You are now ready to run your first test.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Run the following command in a terminal.</p>
+<pre class=".{shell}"><code>$ docker run hello-world</code></pre>
+<p>It should run a container based on the official <a href="https://hub.docker.com/_/hello-world/">Hello World</a> image and display a list of the actions which were performed by the different components Docker relies on.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Write down what are the 4 software components from Docker involved in the previous step.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Now use the <code>docker help</code> and the <code>docker inspect</code> commands to:</p>
+<ol type="1">
+<li>display low-level information on the <code>hello-world</code> image;</li>
+<li>locate where the files for this image are actually stored (this supposes you use the default <em>“overlay2”</em> storage system);</li>
+<li>list the content of the container file system;</li>
+<li>check the type of the <code>hello</code> file using the <code>file</code> utility.</li>
+</ol>
+<p>The <code>hello-world</code> image is minimal in the sense in does not contain any useless bit.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Eventually analyse this file, thing about where it could be run, and write down what this teaches us about:</p>
+<ul>
+<li>the software stack provided by the host system;</li>
+<li>the software stack which resides in the container.</li>
+</ul>
+<h2 id="step-1-understand-container-life-cycle">Step 1: Understand container life cycle</h2>
+<p>We will now use the <code>busybox</code> image to perform some experiments on containers.</p>
+<p><em>busybox</em> is the name of a special program containing essential Linux tools like ls, du, cp, rm, etc. It is commonly used to create minimal Linux systems like Alpine Linux (which is often used as a base image for containers).</p>
+<h3 id="find-the-image">Find the image</h3>
+<p>Because everyone can push images to the Docker Hub, we first want to make sure we are not pulling an evil image.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Using the <code>docker search</code> command, find the official busybox image.</p>
+<h3 id="pull-the-image">Pull the image</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Pull the image manually (we will later see this is optional) and check it is available locally using two subcommands of <code>docker image</code>.</p>
+<h3 id="create-the-container">Create the container</h3>
+<p>Using the <code>docker container create</code> command, you can create a plain new container based on a given image.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Create a container with some name like “<code>bb1</code>”. Because the busybox image starts a shell as default command, it will fail to start in the next step if we do not allocate a pseudo-TTY and keep STDIN open even if not attached. You will need to find the two options required to achieve this.</p>
+<p>You can check the status of the container using the <code>docker container ls</code> command. <strong>You will have to find the right parameters because be default <code>ls</code> displays only running containers.</strong></p>
+<p>At this point, Docker is aware of the security configuration (cgroups parameters) of the container to launch.</p>
+<h3 id="start-the-container">Start the container</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> You can now <strong>start</strong> your container using the appropriate <code>docker container</code> subcommand.</p>
+<p>Now control groups (cgroups) are effectively created for your container. It is possible to manually inspect cgroup configurations and get statics using the cgroup filesystem which should be mounted under <code>/sys/fs/cgroup</code>.</p>
+<p>In particular, if we want to get the list of (host) PIDs of the processes running inside the container, we can display the content of:</p>
+<pre><code>/sys/fs/cgroup/memory/docker/$CONTAINERID/tasks</code></pre>
+<p>Or, if we want to get some statistics about the memory consumption of a container, we can use:</p>
+<pre><code>/sys/fs/cgroup/memory/docker/$CONTAINERID/memory.stat</code></pre>
+<h3 id="attach-the-container-ios-to-your-console">Attach the container IOs to your console</h3>
+<p>It is time to actually use the shell running inside our container.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Use the appropriate <code>docker container</code> subcommand to attach local standard input, output, and error streams to your running container.</p>
+<p>You can now use this new shell to navigate your container’s own filesystem.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Under which user id are you logged into the container?</p>
+<h3 id="start-another-shell-within-the-same-container">Start another shell within the same container</h3>
+<p>We can run several programs concurrently within a same container. They will share the same confinement policy and the same filesystem.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Use the following command to start another shell with the same container. Make sure you understand the parameters used.</p>
+<pre class=".{shell}"><code>docker container exec -i -t bb1 sh</code></pre>
+<p>You now have two shells in the same container.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Check how many containers are running by using <code>docker container ls</code>.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Check how many programs are running inside your container using <code>docker container top</code>.</p>
+<h3 id="natural-stopping">Natural stopping</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Now try the following combinations to determine when the container will stop:</p>
+<ul>
+<li>Keep original shell running and run then close a second one.</li>
+<li>Keep original shell running, run a second one and close the original shell.</li>
+</ul>
+<h3 id="wrapping-up">Wrapping up</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Write down the states a container can be in. Can you draw the possible transitions between those states?</p>
+<h3 id="all-in-one-use-run">All in one: use <code>run</code></h3>
+<p>You can also use the <code>docker [container] run</code> which combines the options of <code>create</code>, <code>start</code> and <code>attach</code>. Note that this will not allow you to run more than one command in the same container.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Try to run another container using this command.</p>
+<h3 id="clean-up-before-next-step">Clean up before next step</h3>
+<p>OK, you nearly completed the first step!</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Before starting step 2, make sure you stop and remove all your containers. You can use the following commands:</p>
+<pre class=".{shell}"><code># list running containers and kill them
+docker container ls -q | xargs docker container kill
+
+# remove all containers without confirmation
+docker container prune -f
+
+# Alternatively:
+docker system prune</code></pre>
+<h2 id="step-2-images-and-containers-management">Step 2: Images and containers management</h2>
+<p>We will now focus on understanding the difference between containers and images, and how to manage each of those.</p>
+<p>Remember that:</p>
+<ul>
+<li>images a simply an archive of a root filesystem containing all the software libraries and ressources your application needs;</li>
+<li>and containers are an empty shell composed of a control group and a filesystem ready to launch programs.</li>
+</ul>
+<h3 id="display-information-about-images-and-containers">Display information about images and containers</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Check the size of the <em>busybox</em> image using a <code>docker image</code> subcommand.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> List the running containers using a <code>docker container</code> subcommand.<br>
+If you still have a shell active in your <em>busybox</em>-based container, then you should see an active container.</p>
+<h3 id="exited-containers">Exited containers</h3>
+<p>If you previously started several containers, they should still be active and waiting for a relaunch. This is because they are not destroyed when the last command of the container exits, unless you explicitly require this to happen when you define the container (when using <code>docker container create</code> or <code>docker container run</code>) using the <code>--rm</code> switch.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Now list all containers (active and stopped) which still are available.</p>
+<p>The output of this listing contains important information. Here is the meaning of each column:</p>
+<dl>
+<dt><strong>CONTAINER ID</strong></dt>
+<dd>unique identifier of the container
+</dd>
+<dt><strong>IMAGE</strong></dt>
+<dd><strong>repository/name:version</strong> of the image used as the base of the container
+</dd>
+<dt><strong>COMMAND</strong></dt>
+<dd>command run in the container; <strong>this indicates the default command if you did not provide any command to </strong>docker container run** or **docker container exec.
+</dd>
+<dt><strong>CREATED</strong></dt>
+<dd>when the container was created
+</dd>
+<dt><strong>STATUS</strong></dt>
+<dd><strong>whether the container is running or not</strong>
+</dd>
+<dt><strong>PORTS</strong></dt>
+<dd>whether some port mapping between the host system and the container were defined
+</dd>
+<dt><strong>NAMES</strong></dt>
+<dd><strong>short name of the container</strong>; either a friendly auto-generated one (like “<code>cool_panda</code>”) if you did not supply one, or the name you define using <code>--name $SOMENAME</code> passed to <code>docker container create</code> or <code>docker container run</code>.
+</dd>
+</dl>
+<h3 id="remove-images-and-containers">Remove images and containers</h3>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Let’s first try to remove the <code>hello-world</code> image. Use the appropriate <code>docker image</code> subcommand to try to remove it.<br>
+What happens?</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Now try to remove all the container you created, and check there is now more running after this.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Finally, remove all the images you pulled locally to free some disk space.</p>
+<h2 id="step-3-understand-file-persistence">Step 3: Understand file persistence</h2>
+<p>In this step you will learn how to create files, loose them, and (maybe) find them again.</p>
+<p>Docker’s container model enables to store files at many different places:</p>
+<ul>
+<li>in the (eventually transient) thin storage layer of a container;</li>
+<li>on the host’s filesystem using bind mounts;</li>
+<li>in dedicated places named “volumes” which are automatically managed by Docker, and can be anonymous or not, shared among containers easily, and much more;</li>
+<li>in a temporary filesystem residing in memory;</li>
+<li>and, ultimately, in a new image though this approach is generally not used directly.</li>
+</ul>
+<figure>
+<img src="./Deployment and virtualization, practice session 1_files/types-of-mounts.png" alt=""><figcaption>Storage overview (credit: Docker)</figcaption>
+</figure>
+<h3 id="file-persistence-in-containers-thin-storage-layer">File persistence in container’s thin storage layer</h3>
+<p>First, let’s start by trying a handful of cases to understand how data is stored in a simple container.</p>
+<figure>
+<img src="./Deployment and virtualization, practice session 1_files/container-layers.jpg" alt=""><figcaption>Container layers (credit: Docker)</figcaption>
+</figure>
+<p><img src="./Deployment and virtualization, practice session 1_files/warning.png" alt="Warning"> <strong>Make sure you remove all containers after each step to avoid strange behaviors.</strong></p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Using the <code>busybox</code> image, try the following scenarios:</p>
+<ol type="1">
+<li><p>Run a first container named create a file “<code>/test1</code>”.<br>
+Stop the container and re-run the command you previously typed.<br>
+Try to access “<code>/test1</code>”.<br>
+What happens?</p></li>
+<li><p>Run a first container named “cont1”, create a file “/test1”.<br>
+Run another shell inside the <strong>same</strong> container, check the file exists.</p></li>
+<li><p>Run a first container named “cont1”, create a file “/test2”.<br>
+Exit the container, and try to re-run the same <code>docker run</code> command.<br>
+What happens?<br>
+</p></li>
+<li><p>Run a first container named “cont1”, create a file “/test3”.<br>
+Run a second container named “cont2” from the same base image.<br>
+Does “/test3” exists?<br>
+</p></li>
+<li><p>Run a first container named “cont1”, create a file “/test4”.<br>
+Exit the container and restart, reattach the shell inside the container.<br>
+Does “/test4” exists?</p></li>
+<li><p>Run a first container named “cont1” <strong>with the <code>--rm</code> option</strong>, create a file “/test5”.<br>
+Exit the container and restart, reattach the shell inside the container.<br>
+What happens?</p></li>
+</ol>
+<p>In the first step, we inspected (using <code>docker inspect</code>) the <code>hello-world</code> image to get more information about the <code>hello</code> program. If we use the default “overlay2” storage driver, then the files for each container are stored under <code>/var/lib/docker/overlay2/</code>, under sub-directories named according to container ids.</p>
+<h3 id="use-bind-mounts">Use bind mounts</h3>
+<p>Bind mounts are a very simple way to share files between the host system and a container. This is a pattern commonly used to run build tools within Docker image on files from the host system. It can also be used to share some files between containers.</p>
+<figure>
+<img src="./Deployment and virtualization, practice session 1_files/types-of-mounts-bind.png" alt=""><figcaption>Bind mounts (credit: Docker)</figcaption>
+</figure>
+<p>In what follows, we will <strong>use the <code>--mount</code> parameter of the <code>run</code> command</strong> to attach or create various storage spaces mounted inside our container’s filesystem. While it is also possible to use the more concise <code>-v</code> or <code>--volume</code> parameter, its syntax is less readable for beginners and we advise you to learn it later. The only difference between the two is that the <code>--volume</code> parameter can create directories or files on the host filesystem (which is usually not desirable) while the <code>--mount</code> prevents you from doing so. Furthermore, <code>--mount</code> is the official recommended way.</p>
+<p>The complete documentation about those commands is available at the <a href="https://docs.docker.com/storage/">official documentation website</a>.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Prepare temporary storage directory at <code>/tmp/testbm</code>.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Using the <code>busybox</code> image, try the following scenarios:</p>
+<ol type="1">
+<li><p>Run a first container <strong>with the <code>--rm</code> option</strong> and use the <code>--mount</code> parameter to create a bindmount from <code>/tmp/testbm</code> to <code>/host</code>.<br>
+Create a file (from the host or the container) and check you can read it from the other side.</p></li>
+<li><p>Run a first container <strong>with the <code>--rm</code> option</strong> and use the <code>--mount</code> parameter to create a bindmount from <code>/tmp/testbm</code> to <code>/host</code>.<br>
+Run a second container with the same options and make sure you can read and write files under “/host” from both sides.</p></li>
+</ol>
+<h3 id="use-volumes">Use volumes</h3>
+<p>The purpose of Docker “volumes” is to provide a standardized way to handle the previous pattern with shareable directories created on-demand or prior to container launch. They are managed by the Docker daemon, and can have more features thanks to volume drivers (to share files between containers on different machines, typically).</p>
+<figure>
+<img src="./Deployment and virtualization, practice session 1_files/types-of-mounts-volume.png" alt=""><figcaption>Volumes (credit: Docker)</figcaption>
+</figure>
+<p>There are two ways to create volumes from the command line (and one from Dockerfiles as we will see in the next session):</p>
+<ol type="1">
+<li>Create an anonymous volume upon container creation. This enables to share a particular sub-tree between containers and to let data survive container removal.</li>
+<li>Create a named volume before container creation using <code>docker volume</code> subcommands. This is just a convenience to give understandable names to volumes and facilitate their management.</li>
+</ol>
+<p>(how to create volumes? explicitly using <code>docker volume create</code> or implicitly using the <code>run</code> command and <code>--volume</code> without host binds?)</p>
+<h4 id="named-volumes">Named volumes</h4>
+<p>As it is simpler to start with named volumes, we will focus on them first.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Using <code>docker volume</code> subcommands, create a volume named <code>vol1</code> and check where its data will actually be stored.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Now create two simple containers which mount this volume under the “<code>/storage</code>” mountpoint, and make sure they can both access the same files.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Using <code>docker volume</code> subcommands, check the size of the volume <code>vol1</code>.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Now remove all containers and volumes.</p>
+<h4 id="anonymous-volumes">Anonymous volumes</h4>
+<p>Anonymous volumes are created when the <code>source</code> parameter of the <code>--mount</code> option is left empty. Nothing special here: it just triggers the creation of a new volume with random name.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Create an anonymous volume using a custom <code>docker run</code> command and create a test file in it.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Find the name of this new volume and verify its files are stored at the same location as the named volumes.</p>
+<p>Such volumes are useful to recover data even after container removal, but it can be challenging to find the right volume if we launched many containers with anonymous volumes…</p>
+<p>A last useful trick is to launch a container with all the volumes from another one. This makes easy to debug database systems for instance, where the image is trimmed down to a bare minimum without exploit-friendly tools like shells. Using this technique, a container can use the same mount points as another one (running or exited) with all the necessary tools to perform a diagnosis.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Let us just try this feature quickly: run a first container with a named volume, then run a second using the <code>--volumes-from</code> parameter. Giving a name to your first container will make things easier.</p>
+<h3 id="use-temporary-filesystems">Use temporary filesystems</h3>
+<p>Temporary filesystems are in-memory filesystems which enable fast operations on small files. They are cleared upon container exit, no matter whether the container survives or not. Beside their speed, another advantage of this kind of storage is that its size can be easily be capped.</p>
+<figure>
+<img src="./Deployment and virtualization, practice session 1_files/types-of-mounts-tmpfs.png" alt=""><figcaption>TMPFS (credit: Docker)</figcaption>
+</figure>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Launch a container with a temporary filesystem. In the <code>--mount</code> parameter, use the <code>tmpfs-size</code> option to limit the size to something really small (a hundred of bytes), then write many lines in a test file using something like that:</p>
+<pre class=".{shell}"><code># In the container
+$ for i in $(seq 2000); do echo $i &gt;&gt; /tmpfs/test; done</code></pre>
+<p>What happens?</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Exit the previous container (do not remove it) and try to restart the <strong>same</strong> container (and reattach your console to the shell running in it) to check what happened to our test file.<br>
+Does the TMPFS volume survive container exit?</p>
+<h3 id="commit-changes-to-a-new-image">Commit changes to a new image</h3>
+<p>Finally, the very last way to store information is to commit changes made to the thin storage layer of a container to a new image. This will create a new image container another layer on top.</p>
+<p><img src="./Deployment and virtualization, practice session 1_files/work.png" alt="Work"> Start a new container and create a simple test file at the root of its filesystem, with something like:</p>
+<pre class=".{shell}"><code>docker run -it --name cont1 busybox sh -c 'echo hello &gt; testfile'</code></pre>
+<p>then use <code>docker container commit</code> to create another image containing those changes, and create another container based on this image.<br>
+Make sure the changes are here.<br>
+How many layers does the new image have?</p>
+
+
+</body></html>

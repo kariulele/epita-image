@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!-- saved from url=(0080)https://www.lrde.epita.fr/~jchazalo/teaching/DVIRT19/practice02/indications.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Joseph Chazalon, Clément Demoulins {firstname.lastname@lrde.epita.fr}">
+  <title>Deployment and virtualization, practice session 2</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Deployment and virtualization, practice session 2</h1>
+<p class="author">Joseph Chazalon, Clément Demoulins {firstname.lastname@lrde.epita.fr}</p>
+<p class="date">October’19</p>
+</header>
+<h2 id="introduction">Introduction</h2>
+<p>This second session about Docker will teach you how to write Dockerfiles and build images for a couple of use cases. The next session will give you more freedom about <em>dockerizing</em> applications and you will have to reuse what you will learn during this session.</p>
+<p>All actions you need to perform are indicated by the following pictogram: <img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"></p>
+<p>Make sure you read and understand all the material of this document, and go through all the required actions.</p>
+<p><strong>Also, be sure to keep notes about what you are doing, as you will have to answer graded questions about your work during the last 15 minutes of the session.</strong></p>
+<h2 id="use-case-1-distribute-a-go-program">Use case 1: Distribute a <em>Go</em> program</h2>
+<p>The <a href="https://golang.org/">Go language</a> creators did a great job a providing their community with easy-to-use tools thanks to Docker. Studying how things are done with Go is a good example of how to leverage Docker for software distribution.</p>
+<p>The tools provided using Docker cover two major aspects of software development:</p>
+<ol type="1">
+<li>The creation of redistributable software artifacts: compile, link, package, etc. For this purpose we need a particular software stack which contains compilers, static analysis tools, linkers, cross-build toolchains, and so on…</li>
+<li>The execution of the piece of software previously created over a <strong>runtime</strong> software stack. Ideally, such software stack should be well-identified and minimized to reduce as much as possible the surface for attack or dependency issues, and also to facilitate maintenance.</li>
+</ol>
+<p>Why not installing and using a toolchain directly from our distribution? Here is a great answer from <a href="https://blog.docker.com/2016/09/docker-golang/">Docker’s blog</a>:</p>
+<blockquote>
+<p>If you write Go code, or if you have even the slightest interest into the Go language, you certainly have the Go compiler and toolchain installed, so you might be wondering “what’s the point?”; but there are a few scenarios where you want to compile Go without installing Go.</p>
+<ul>
+<li>You still have this old Go 1.2 on your machine (that you can’t or won’t upgrade), and you have to work on this codebase that requires a newer version of the toolchain.</li>
+<li>You want to play with cross compilation features of Go 1.5 (for instance, to make sure that you can create OS X binaries from a Linux system).</li>
+<li>You want to have multiple versions of Go side-by-side, but don’t want to completely litter your system.</li>
+<li>You want to be 100% sure that your project and all its dependencies download, build, and run fine on a clean system.</li>
+</ul>
+<p>If any of this is relevant to you, then Docker should be useful!</p>
+</blockquote>
+<p>In what follows, we will</p>
+<ol type="1">
+<li>Build a simple Go program using different techniques;</li>
+<li>Distribute this program and the software stack it relies on using a Dockerfile.</li>
+<li>Optimize a bit the size of our image to facilitate its distribution.</li>
+</ol>
+<h3 id="build-a-go-program-using-tools-from-a-docker-image">Build a Go program using tools from a Docker image</h3>
+<p>The very simple program we are going to build and run, and the associated resources, are packaged in the <a href="https://www.lrde.epita.fr/~jchazalo/teaching/DVIRT19/practice02/resources.tar.gz"><code>resources.tar.gz</code></a> archive. It is composed of a single file named “<code>simple_static_server.go</code>” which should serve the static files under the “<code>resources/static</code>” directory.</p>
+<p>We will build and run this program in various ways.</p>
+<h4 id="identify-a-good-base-image">Identify a good base image</h4>
+<p>Let us first identify the right Docker image to build our program. What we need is a reliable image which contains build tools for the Go language.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using the <a href="https://hub.docker.com/">Docker hub</a>, identify a group of images, then a particular image which you will use.</p>
+<h4 id="build-your-program-using-the-image-directly">Build your program using the image directly</h4>
+<p>Using the <code>golang</code> image variant you selected, we can call the compilation tools directly on our files thanks a bind mount of the current directory.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Navigate to the “<code>resources</code>” directory of this session, then adapt and run the following command line to create your application.<br>
+</p>
+<pre class=".{shell}"><code>docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.8 go build -v</code></pre>
+<p><strong>What is the use of the <code>/usr/src/myapp</code> path? Can you explain what is going on?</strong></p>
+<p>You should obtain a <code>myapp</code> file under your current directory.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Try to run the application to test it. There is a <code>--port</code> option available to select the port you want your server to listen to. You can check it works by connecting to <code>http://localhost:$YOURPORT</code>.</p>
+<p>If you check the owner of the produced file, then you should notice that it is owned by <code>root</code>. This is due to the fact that the Go compiler within the container runs under the <code>root</code> user.</p>
+<p>Out of curiosity, you can also check the size of the resulting binary, and its library dependencies using <code>ldd</code> (for example).</p>
+<h3 id="prepare-a-runtime-image">Prepare a runtime image</h3>
+<p>We will now focus on building an image to distribute our program and run it in isolation.</p>
+<h4 id="turn-key-solution">Turn-key solution</h4>
+<p>The easiest solution (but not the best one) is to use the image used to build as a base for our new image.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using the <code>golang</code> image variant you previously selected as base image, create a Dockerfile which has the following steps:</p>
+<ol type="1">
+<li>set the working directory to some meaningful place within the container, like “<code>/usr/src/app</code>”;</li>
+<li>copy the application files to this location;</li>
+<li>call the Go builder;</li>
+<li>expose the default port;</li>
+<li>define the default command to run.</li>
+</ol>
+<p>Then build your image using the appropriate <code>docker build</code> invocation.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Once you managed to build your image successfully, find the right command to launch your application. Do not forget to expose the ports of the container on the host machine.<br>
+<em>TIP: You can use <code>docker port $CONTAINERNAME</code> to check the port redirections for your container.</em></p>
+<h4 id="use-a-smaller-base-image">Use a smaller base image</h4>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Check the size of the image you previously created.<br>
+<strong>What is wrong?</strong></p>
+<p>According to Docker’s documentation about <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">best practices</a> (and common sense), it is not desirable to ship large images containing a lot of useless elements.</p>
+<p>In our particular case, we do not want to ship a Debian distribution with our tiny server (assuming you used the default “<code>latest</code>” image).</p>
+<p>We are now going to use a smaller image.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Try to use the <code>alpine</code> variant as a base image for your Dockerfile.<br>
+<strong>What is the size of the resulting image?</strong></p>
+<p>We do not need all the build tools in any of the <code>golang</code> image variants!</p>
+<h4 id="use-a-really-small-base-image">Use a really small base image</h4>
+<p>The right approach is to use a minimal base image, like an <code>alpine</code> image, to run our program. In our case, because our program does not have complicated dependencies, we can simply copy it to a new linux image.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Use an alpine image as a base and copy the program you compiled at some convenient location, with necessary files. Make sure you can run your program.</p>
+<h4 id="use-a-multistage-build">Use a multistage build</h4>
+<p>It is possible to merge the two steps of the previous section using a multistage build. This consists in creating several images in the same Dockerfile. In our case, we need only two images:</p>
+<ol type="1">
+<li>a build image (exactly what we did before);</li>
+<li>a runtime image (which contains only the bare minimum) like in the previous section.</li>
+</ol>
+<p>The <a href="https://docs.docker.com/develop/develop-images/multistage-build/">official documentation</a> details this tricks which relies on two simple things:</p>
+<ol type="1">
+<li>naming images with the syntax: <code>FROM image as name</code>;</li>
+<li>being able to copy from any named image using the following syntax: <code>COPY --from=name /path/in/name/ /path/in/current</code></li>
+</ol>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Use the multistage build trick to create a small image for your program, and check it works!</p>
+<h4 id="use-the-smallest-possible-image">Use the smallest possible image</h4>
+<p><img src="./Deployment and virtualization, practice session 2_files/stop.png" alt="Work"> <strong>Skip this and go to the next section if you are short in time.</strong></p>
+<p>Go is particularly useful to produce minimal binaries thanks to static compilation.</p>
+<p>This allows us to build a program which does not depend on anything but the kernel, except for a few files if we use, for instance, HTTPS which requires some certificates.</p>
+<p>Go static compilation can be triggered by using:</p>
+<pre class=".{shell}"><code>go build -ldflags "-linkmode external -extldflags -static" -v</code></pre>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using this final trick, use a multistage build to create a very small final image based on the <code>scratch</code> (ie empty) base image.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> How would you use this neat minimal container as an on-demand HTTP server used to share your current directory over the network?</p>
+<h2 id="use-case-2-create-a-conda-like-environment">Use case 2: Create a Conda-like environment</h2>
+<p><a href="https://conda.io/">Conda</a> is an open source package management system and environment management system. <em>“Package management”</em> is about solving the dependency problem of package installation: <em>What should I install to make this program work?</em> <em>“Environment management”</em> is about enabling to separate separate independent and potentially conflicting software stacks.</p>
+<p>Conda was first designed for Python language but it can now handle binaries and libraries from various languages. It can also run in Linux, OSX and Windows.</p>
+<p>Conda addresses the limitations of pure-Python tools for package management (<em>easy_install</em>, <em>pip</em>, etc.) and environment management (<em>virtualenv</em>): those tools fail at properly managing library dependencies for Python packages. It is indeed common to face compilation issues because <em>pip</em> triggered a compilation of some C code which relies on a library for which the development header were not installed. This happens when you want to install <em>NumPy</em>, for instance, in a very small base Docker image: the headers for linear algebra libraries are not installed.</p>
+<p>Conda’s solution is to rely on a massive repository of pre-built packages, maintained by the <a href="https://www.anaconda.com/">Anaconda company</a>. Each <a href="https://conda.io/projects/conda/en/latest/user-guide/concepts/packages.html">Conda package</a> can contain:</p>
+<ul>
+<li>system-level libraries</li>
+<li>Python or other modules</li>
+<li>executable programs and other components</li>
+<li>some metadata.</li>
+</ul>
+<p><strong>This really looks like a Docker image layer!</strong></p>
+<p>We are going to simulate the kind of environment Conda produces using Docker containers. This will allow us to share some parts of the environments we will create, and have the full control over our software stack.</p>
+<p>Of course, this is a bit more complex than using Conda’s tools, but not that much in practice and it provides a few advantages:</p>
+<ul>
+<li>once an environment is defined using a Dockerfile, it is very easy to replicate it;</li>
+<li>we can limit the resources used by a container.</li>
+</ul>
+<p>In what follows, we will setup a Python environment for scientific computing. Before and while writing a Dockerfile, we encourage you to test your commands in a container based on the image you want to use.</p>
+<h3 id="choose-a-base-image">Choose a base image</h3>
+<p>Like in the previous case, identifying the right base image is a critical choice. The <a href="https://hub.docker.com/search?q=linux&amp;type=image">Docker Hub</a> references a lot of base image to build on.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> From an Alpine base image (use the <code>docker run</code> command directly), try to install Python (using <code>apk add</code>) and the latest version of the NumPy library (using some <code>pip install</code> variant).<br>
+<strong>What’s wrong?</strong></p>
+<p>For what follows, we recommend using an Ubuntu base image or the official Python image, as their support is very good and their reasonable. You may, however, use another image you more confident with. What follows assume you use an Ubuntu base, because it contains extra necessary steps.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using Docker Hub (website or command line), identify precisely which base image you are going to use.</p>
+<h3 id="install-python-and-pip">Install Python and pip</h3>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using the package manager of Ubuntu (<code>apt</code>), identify and install the packages which provide the <code>python3</code> environment, and the <code>pip3</code> tool.<br>
+<strong>What is the size of the resulting image?</strong></p>
+<h3 id="locale-setup">Locale setup</h3>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Try the following command in a container running the base image you chose:</p>
+<pre class=".{shell}"><code>python -c 'print("h\xe9h\xe9")'</code></pre>
+<p><strong>What happens?</strong></p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Let us fix our terminal: set the <code>LANG</code> environment variable to a saner <code>C.UTF-8</code> default.<br>
+You can check the language defaults using the <code>locale</code> command.</p>
+<h3 id="install-numpy-ipython-and-jupyter">Install NumPy, IPython and Jupyter</h3>
+<p>We are now ready to install Python tools.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using appropriate <code>pip(3)</code> commands, install the following tools in your container:</p>
+<ul>
+<li>NumPy;</li>
+<li>IPython;</li>
+<li>Jupyter.</li>
+</ul>
+<p>You can try to limit the amount of useless space consumed by disabling the pip cache with <code>--no-cache-dir</code>.</p>
+<h3 id="add-a-special-user">Add a special user</h3>
+<p>We will do a little trick here. To avoid several issues (programs complaining when run as <code>root</code>, messing file permissions, etc.) we will add a new user in the container. We want this user to have the <strong>same UID and GID as our current (host) user</strong>, so we can share files easily with her, but we want this user to have a <strong>different name and a different home directory</strong>, to be able to store container-specific configuration, avoid avoid messing our own configuration on the host.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Create a new user “developer” in the container.</p>
+<ul>
+<li>Declare arguments in the Dockerfile (using <code>ARG</code>) to take the user id and the group id this user will have at build time (thanks to <code>--build-arg</code> parameters to <code>docker create / run</code>) — you can get the UID and GID of your host user with the <code>id</code> command.</li>
+<li>Give this new user a home at <code>/home/developer</code>.</li>
+<li>Define the environment variable <code>HOME</code>.</li>
+</ul>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Activate this user for the rest of the Dockerfile using the <code>USER</code> instruction.</p>
+<h3 id="jupyter-configuration-and-expose-the-ports">Jupyter configuration and expose the ports</h3>
+<p>To avoid authentication issues with Jupyter, we will remove the security token required. This is a security issue, and you should put a custom string instead of a empty one in production.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> First add the following line to your Dockerfile (make sure the environment variable <code>HOME</code> is previously defined in your Dockerfile):</p>
+<pre><code>RUN jupyter notebook --generate-config &amp;&amp; \
+  echo "c.NotebookApp.token = ''" &gt;&gt; $HOME/.jupyter/jupyter_notebook_config.py</code></pre>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Use the <code>EXPOSE</code> instruction to declare the port used by Jupyter (you will be able to select it when running <code>jupyter notebook</code> with the <code>--port</code> parameter).</p>
+<h3 id="setup-a-volume-for-specific-configuration">Setup a volume for specific configuration</h3>
+<p>To avoid loosing data related to container configuration, we can declare a volume for the home directory of the new container user. This will create an external storage for this part of the filesystem, with the current content of the container at this time.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Simply use the <code>VOLUME</code> instruction to define a volume for the home directory of the container user.</p>
+<p><em>It will be possible to mount an existing volume to this location, or to bind-mount a host directory, but this may mask the actual content of this volume created during image build.</em></p>
+<h3 id="setup-the-entry-point-andor-the-default-command">Setup the entry point and/or the default command</h3>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Using the proper Dockerfile instruction, launch a Jupyter notebook server on the port of your choice. We recomend using a command like the following one:</p>
+<pre class=".{shell}"><code>jupyter notebook --no-browser --ip=0.0.0.0 --port $JUPYTER_PORT</code></pre>
+<h3 id="build-the-image">Build the image</h3>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Build your Docker image.<br>
+<strong>Which command line are you going to pass, in order to pass build arguments properly?</strong></p>
+<h3 id="run-the-container">Run the container</h3>
+<p>We will now run a container based on our new image.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> First just test run your container to check Jupyter is starting properly.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Now start a shell in your container and check what is the current directory and user id.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Finally, find the complete perfect command line to run your container which:</p>
+<ul>
+<li>bind mounts your host home directory to the same path in the container, but read only;</li>
+<li>bind mounts the host current directory under the same path (writable);</li>
+<li>selects the current directory as working directory;</li>
+<li>exposes the Jupyter port properly.</li>
+</ul>
+<h3 id="resource-limitation">Resource limitation</h3>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Improve the command line to launch your container by adding a memory limit and a CPU limit (maximum 1 CPU).<br>
+Try to launch several terminals in the container and create some load for 1, then 2, then 3 CPUs in the container (using something like <code>yes &gt; /dev/null</code> for instance) and monitor what happends from the host point of view.</p>
+<h3 id="new-tools-in-new-image-layers-for-alternative-environments">New tools in new image layers for alternative environments</h3>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> Run a shell as root and install htop.</p>
+<p><img src="./Deployment and virtualization, practice session 2_files/work.png" alt="Work"> How would you proceed to install new Python tools in your container, like for instance, two different versions of OpenCV?<br>
+Can you list at least two ways of doing it?<br>
+What are the impact of each solution regarding the space consumed for each new element to install?</p>
+
+
+</body></html>
