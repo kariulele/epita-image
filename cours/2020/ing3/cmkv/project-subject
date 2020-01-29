@@ -1,0 +1,51 @@
+On est en 2099 et les data centers de Gloogle ont fait fondre toute la
+glace (c'est pas terrible, on boit maintenant des Pastis tièdes).
+L'énergie est devenue rare et les autoroutes de l'information sont
+maintenant des petits chemins.  Impossible de s'échanger sur le réseau
+de lourdes images (les chats ne sont plus LOL) ni des vidéos (plus de
+paillettes dans la vie).  Bref, c'est l'effondrement :
+  https://fr.wikipedia.org/wiki/Risques_d%27effondrements_environnementaux_et_soci%C3%A9taux
+
+Une start-up a alors eu la bonne idée d'encoder les pixels des images
+sur 3 bit :
+
+Color Code RGB
+-------------------
+Black K 000
+Blue B 001
+Green G 010
+Cyan C 011
+Red R 100
+Magenta M 101
+Yellow Y 110
+White W 111
+
+afin de les compresser à mort et de pouvoir continuer à mater des
+vidéos de chats.  Bon, pour ça marche, il faut :
+
+- que l'image encodée avec les 8 couleurs ressemble à l'image
+  d'entrée ;
+
+- et que l'image encodée ne contienne pas beaucoup de points à
+  l'interface entre les couleurs (on veut des régions et peu de
+  frontières ; comme dans l'exemple en noir et blanc, vu en cours, et
+  posée ici https://www.lrde.epita.fr/~theo/private/lena_cow.pdf ).
+
+Vous formez des groupes de 3 (un qui bosse, un autre qui regarde et le
+3e qui n'est pas là).  Supposons que le nom de famille d'un membre du
+groupe est "<toto>".  Vous rendez par mail (avec le flag "[CMKV]" dans
+le sujet) une archive, <toto>.tar.gz ou <toto>.zip, qui s'expande dans
+un répertoire qui s'appelle <toto>, contenant un fichier AUTHORS et un
+Makefile.  L'archive ne doit *pas* contenir de fichiers binaires (donc
+pas d'images non plus).  Faire make compile avec g++ en version
+optimisée (typiquement -O5) et crée un exécutable "cmkv".
+L'utilisation de cet exécutable est :
+
+./cmkv image_input.png image_output.png
+
+Le projet est à faire en C++ ; pour lire / écrire
+des images, vous utilisez la bibliothèque freeimage :
+  http://freeimage.sourceforge.net/
+Évitez svp l'inclusion de bibliothèques tièces pour pas grand-chose...
+Pour vos tests, une image que j'utiliserai pour l'évaluation est ici :
+  https://www.lrde.epita.fr/~theo/private/parrots.pngi
