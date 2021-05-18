@@ -1,0 +1,700 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[french]{babel}
+\usepackage{fancyhdr}
+\usepackage[margin=.8in]{geometry}
+
+\usepackage{Style/TeXingStyle}
+
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{1.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+\fancyhead[L]{EPITA\_ING2\_2020\_S8}
+\fancyhead[R]{Majeures SCIA \& IMAGE}
+\fancyhead[C]{OCVX}
+\fancyfoot[C]{\thepage}
+\fancyfoot[L]{2019}
+\fancyfoot[R]{\footnotesize{\textbf{Chargés de cours :} \textsc{B.~DUDIN} \& \textsc{G.~TOCHON}}}
+
+\pretitle{\vspace{-2.5\baselineskip} \begin{center}}
+\title{%
+  { \huge Un peu de calcul différentiel}%
+}
+\posttitle{
+\end{center}
+\rule{\textwidth}{1.5pt}
+\vspace{-3\baselineskip}
+}
+\author{}
+\date{}
+
+\pdfinfo{
+   /Author (Bashar Dudin)
+   /Title  (Calcul Différentiel - 2019)
+   /Subject (SCIA/IMAGE - Optimisation convexe)
+}
+
+\setlength\parindent{0pt}
+
+\begin{document}
+
+\maketitle\thispagestyle{fancy}
+
+\begin{abstract}
+  On souhaite généraliser la démarche adoptée pour résoudre
+  géométriquement certains programmes linéaires au cas des problèmes
+  d'optimsation non-linéaires. L'objectif est de trouver des
+  hyperplans d'appui aux sous-niveaux d'une fonction objectif ; ils
+  indiquent une direction de recherche pour minimiser celle-ci. La
+  définition de ces hyperplans d'appui s'effectue par une étude locale
+  des fonctions objectifs, une étude qui généralise l'apport de la
+  dérivée d'une fonction numérique à la compréhension du comportement
+  de celle-ci en un point.
+\end{abstract}
+
+\tableofcontents
+
+\section{Normes sur $\R^n$}
+\label{sec:nomesRn}
+
+Une norme sur un espace vectoriel apporte une manière de mesurer la
+\textit{longueur} d'un vecteur tout en respectant un minimum la
+structure vectorielle. Elle permet en particulier de définir une
+notion de distance entre deux point de $\R^n$ par la \textit{longueur}
+du vecteur qui les relie. Pouvoir changer de mesure de longueur
+suivant les problèmes qu'on attaque est crucial lorsque l'on s'attaque
+à des problèmes d'optimisation. À la fois pour pouvoir modéliser les
+problèmes en jeu ; comment mesure la différence entre deux mots? Ou
+pour accélérer la convergence de certains algorithmes
+d'apprentissages.
+
+\begin{defn}
+  Une norme sur $\R^n$ est une application $\|\cdot\| : \R^n \to \R_+$
+  telle que:
+  \begin{enumerate}
+  \item $\|x\| = 0 \Leftrightarrow x = 0$ ;
+  \item $\forall \lambda \in \R$, $\forall x \in \R^n$,
+    $\|\lambda x\| = |\lambda|\|x\|$ (relation d'\textit{homogéinité});
+  \item $\forall x \in \R^n$, $\forall y \in \R^n$,
+    $\|x + y\| \leq \|x\| + \|y\|$ (\textit{Inégalité triangulaire}).
+  \end{enumerate}
+\end{defn}
+\begin{question}
+  Interpréter chacune des propriétés suivantes avec vos propres mots.
+\end{question}
+L'inégalité triangulaire donne lieu à une autre inégalité, appelée
+\textit{inégalité triangulaire inversée} qui peut parfois être
+utile\footnote{Il est très probable qu'elle ne fasse que partie de
+  votre culture ...}:
+\[
+  \forall x, y \in \R^n, \qquad \big| \|x\| -\|y\| \big| \leq \|x -
+  y\|.
+\]
+\begin{question}
+  Représenter cette inégalité géométriquement. Essayer de la déduire
+  de l'inégalité triangulaire.
+\end{question}
+Les trois normes les plus fréquentes d'utilisation sont les trois
+suivantes, elles sont respectivement qualifiées de normes $1$, $2$ et
+infinie.
+\begin{enumerate}
+\item $\forall x \in \R^n$, $\| x \|_1 = \sum_{i=1}^n |x_i|$ ;
+\item $\forall x \in \R^n$,
+  $\| x \|_2 = \sqrt{\sum_{i=1}^n x_i^2} = \sqrt{x^Tx}$ ;
+\item $\forall x \in \R^n$, $\|x \|_{\infty}$,
+  $\max\{|x_i| 1 \leq i \leq n\}$.
+\end{enumerate}
+Les définitions des normes $1$ et $2$ vont pouvoir se généraliser pour
+tout $p \geq 1$\footnote{Il est tout à fait naturel de se poser la
+  question de savoir pourquoi $p \geq 1$! :)}, par
+\[
+  \forall x \in \R^n, \qquad \|x \|_p = \left(\sum |x_i|^p
+  \right)^{\frac{1}{p}}.
+\]
+La norme $\|\cdot\|_p$ est communément appelée la norme $p$. Montrer
+le fait que c'est une norme est uniquement délicat pour ce qui est de
+l'inégalité triangulaire, la preuve de ce fait se base sur des
+inégalités de convexités dites de \textsc{Hölder}, on n'abordera pas
+cette preuve dans ce cours.Les normes $p$ ne seront que très
+localement utilisées en dehors des cas standards des normes $1$, $2$
+et $+\infty$, il est cela dit usuel d'en connaître la définition.
+
+À partir d'une norme on va être en mesure de définir:
+\paragraph{Une notion de \textit{distance} entre deux points de
+  $\R^n$} par norme du vecteur de qui relie les deux points en
+question. Plus formellement étant donné une norme $\|\cdot\|$ on note
+\[
+  \forall x, y, \qquad d_{\|\cdot\|}(x, y) = \| x - y \|.
+\]
+Dans le cas des normes $p$ on se contente d'indiquer $p$ en indice.
+\begin{question}
+  Représenter graphiquement les distances $1$, $2$ et $+\infty$
+  entre deux vecteurs de $\R^2$.
+\end{question}
+\paragraph{Une notion de \textit{voisinage} d'un point de $\R^n$} au
+sens de la norme utilisée. Cette notion éminemment liée à la
+première, on l'isole ici parce qu'elle apporte un point de vue
+auquel vous n'avez pas encore été confrontés. Étant donné un nombre
+réel $\varepsilon > 0$ on va qualifier $\varepsilon$-voisinage d'un
+point $x \in \R^n$ tous les points à distance (au sens de la norme
+utilisée) au plus $\varepsilon$ de $x$. Dans le jargon, on appelle
+boule ouverte de rayon $\varepsilon$ et centrée en $x$ cette notion,
+pour une norme ambiante $\|\cdot\|$ on note
+\[
+  B_{\|\cdot\|}(x, \varepsilon) = \{y \in \R^n \mid d_{\|\cdot\|}(x, y) <
+  \varepsilon\}
+\]
+La boule fermée centrée en $x$ et de rayon $\varepsilon$ est la
+notion correspondante avec les points à distance $\varepsilon$
+incluses,
+\[
+  \overline{B}_{\|\cdot\|}(x, \varepsilon) = \{y \in \R^n \mid d_{\|\cdot\|}(x,
+  y) \leq \varepsilon\}.
+\]
+Dans le cas des normes $p$ on se contente d'indexer les boules par
+$p$.
+
+La notion de $\varepsilon$-voisinage permet d'exprimer des
+phénomènes de passage à la limite et d'études locales. Dire qu'une
+suite $(u_k)_{k \in \N}$ de points de $\R^n$ converge vers
+$\ell \in \R^n$, au sens d'une norme $\|\cdot\|$, correspond au fait
+de dire que pour tout $\varepsilon$-voisinage $B(\ell, \varepsilon)$
+de $\ell$, il existe un rang $N$ à partir duquel tous les éléments
+de la suite $u_k$ sont dans $B(\ell, \varepsilon)$.
+\begin{question}
+  \begin{itemize}
+  \item Dessiner les boules unités
+    $\overline{B}_p(\underline{0}, 1)$ pour
+    $p \in \{1, 2, \infty\}$.
+  \item Montrer que les $\varepsilon$-voisinages d'une norme
+    $\|\cdot\|$ sur $\R^n$ sont convexes.
+  \item La définition d'un équivalent à une norme $p$ pour $p < 1$
+    définit-il une norme?
+  \end{itemize}
+\end{question}
+On reprend plus en détails quelques extensions des notions liées aux
+études locales de fonctions en suites dans $\R$.
+\begin{exmp}[Convergence d'une suite.]
+  Une suite $(u_k)_{k\in \N}$ dans $\R^n$ converge vers un point
+  $\ell \in \R^n$, au sens d'une norme $\|\cdot\|$ si
+  \[
+    \forall \varepsilon > 0, \exists N \in \N, \quad k \geq N
+    \Rightarrow \|u_k - \ell \| < \varepsilon.
+  \]
+  Cette défintion se traduit telle quelle par:
+  \[
+    \forall \varepsilon > 0, \exists N \in N \quad k \geq N
+    \Rightarrow u_k \in B(\ell, \varepsilon).
+  \]
+  Ou encore: pour tout $\varepsilon > 0$ il existe un rang $N$ à
+  partir duquel tous les éléments de la suite $u_k$ sont dans le
+  $\varepsilon$-voisinage de $\ell$ pour la norme $\|\cdot\|$.
+
+  Dans le cas de la norme infinie, la définition précédente s'écrit
+  explicitement comme
+  \[
+    \forall \varepsilon > 0, \exists N \in \N, \quad k \geq N
+    \Rightarrow \max_{1 \leq i \leq n}\|u_{k, i} - \ell_i \| < \varepsilon.
+  \]
+  où $u_{k, i}$ (resp. $\ell$) est la composante le long de la
+  coordonnée $i$ du vecteur $u_k$ (resp. $\ell_i$). Cette définition
+  peut encore être réécrite
+  \[
+    \forall \varepsilon > 0, \exists N \in \N, \quad k \geq N
+    \Rightarrow \forall i \in \{1, \ldots, n\}, \|u_{k, i} - \ell_i \| <
+    \varepsilon.
+  \]
+  Un peu de réflexion permet de voir que cette dernière est
+  équivalente
+    \[
+      \forall i \in \{1, \ldots, n\}, \forall \varepsilon > 0, \exists
+      N \in \N, \quad k \geq N \Rightarrow \|u_{k, i} - \ell_i \| <
+      \varepsilon.
+  \]
+  Autrement dit, la suite $(u_k)$ converge vers $\ell$, au sens de la
+  norme infinie, si et seulement si, chacune des suites
+  \textbf{numériques} $(u_{k, i})$ converge vers $\ell_i$.
+\end{exmp}
+\begin{exmp}[Limite d'une fonction en un point.]
+  On considère deux normes $\|\cdot\|_\alpha$ et $\|\cdot\|_\beta$
+  respectivement sur $\R^n$ et $\R^m$. Une fonction
+  $f : (\R^n, \|\cdot\|_\alpha) \to (\R^m, \|\cdot\|_\beta)$ a une
+  limite $\ell \in \R^m$ en un point $a \in \R^n$ si
+  \[
+    \forall \varepsilon > 0, \exists \eta > 0, \quad x \neq a
+    \mathrm{ et } \|x - a\|_\alpha \eta \Rightarrow \|f(x) -
+    \ell\|_\beta < \varepsilon.
+  \]
+  Chose qu'on peut encore exprimer par
+  \[
+    \forall \varepsilon > 0, \exists \eta > 0, \quad x \in
+    B_{\|\cdot\|_\alpha}(a, \eta)\setminus \{a\} \Rightarrow f(x) \in
+    B_{\|\cdot\|_\beta}(\ell, \varepsilon),
+  \]
+  ou encore pour tout $\varepsilon$-voisinage $B$ de $\ell$ pour la
+  norme $\|\cdot\|_\alpha$ il existe un $\eta$-voisinage de $a$, a
+  étant exclu dont tout élément a une image dans $B$.
+\end{exmp}
+\begin{exmp}[Continuité d'une fonction en un point.]
+  La continuité d'une fonction
+  $f : (\R^n, \|\cdot\|_\alpha) \to (\R^m, \|\cdot\|_\beta)$ en un
+  point $a \in \R^n$ s'écrit
+  \[
+    \forall \varepsilon > 0, \exists \eta > 0, \quad \|x - a\|_\alpha
+    \eta \Rightarrow \|f(x) - f(a)\|_\beta < \varepsilon.
+  \]
+  Autrement dit pour tout $\varepsilon$-voisinage $B$ de $f(a)$ pour
+  la norme $\|\cdot\|_\alpha$ il existe un $\eta$-voisinage de $a$
+  dont tout élément a une image dans $B$.
+\end{exmp}
+\begin{question}
+  \begin{itemize}
+  \item Donner des exemples de fonctions continues (pour les normes de
+    votre choix) de $\R^2$ dans $\R$.
+  \item Comment peut-on en construire d'autres à partir de celles-ci?
+    Que dire de l'addition, la multiplication, le quotient ou la
+    composition de fonctions continues?
+  \item Comment tester la continuité de fonctions à plusieurs
+    variables en se ramenant au cas des fonctions numériques?
+  \item Est-ce que \c{c}a marche tous le temps?
+  \end{itemize}
+\end{question}
+\begin{exmp}[Comparaisons en un point.]
+  Une fonction
+  $f : (\R^n, \|\cdot\|_\alpha) \to (\R^m, \|\cdot\|_\beta)$ est un
+  $o$ en un point $a \in \R^n$ d'une fonction $g$, sur les mêmes
+  espaces et par rapport aux mêmes normes, s'il existe une fonction
+  $\epsilon : \R^n \to \R$ telle que $f = \epsilon g$ avec
+  $\lim_{t \to a }\epsilon(t) = 0$. Quand $g$ n'est pas nulle sur un
+  voisinage de $a$ la définition précédente est équivalente au fait que
+  \[
+    \lim_{t \to a} \frac{\|f(t)\|_\alpha}{\|g(t)\|_\beta}  = 0.
+  \]
+  On écrit dans ce cas que $f$ est un $o_a(g)$. On laisse tomber le
+  point $a$ quand celui-ci est clair du contexte.
+
+  Pour obtenir les notions d'équivalence et de $\mc{O}$ en un point
+  $a$, il suffit de remplacer les limites de $\epsilon$ ou de quotient
+  respectivement par $1$ et une constante positive quelconque.
+\end{exmp}
+\begin{question}
+  Justifier les affirmations suivantes:
+  \begin{enumerate}
+  \item $\langle h, h \rangle$ est un $o_{\underline{0}}(h)$;
+  \item
+    $\sin\big(\langle h, h \rangle\big) \sim_{\underline{0}} \langle
+    h, h \rangle$.
+  \end{enumerate}
+\end{question}
+À ce stade on est en droit de se demander si le choix des normes avec
+lesquels on travaille a une incidence sur les limites des suites qu'on
+étudie (une même suite convergerait pour une norme et pas pour une
+autre), les fonctions qu'on regarde (une même fonction serait continue
+pour une norme et pas pour une autre) etc. Le théorème suivant permet
+de se rassurer sur ce point (du moins en dimension finie).
+\begin{defn}
+  Deux normes $\|\cdot\|_\alpha$ et $\|\cdot\|_\beta$ sur $\R^n$ sont
+  dites \emph{équivalentes} s'il existe des constants $c$,
+  $C \in \R_+^*$ telles que
+  \[
+    \forall x \in \R^n, \qquad c\|x\|_\alpha \leq \|x\|_\beta \leq
+    C\|x\|_\alpha.
+  \]
+\end{defn}
+En reprenant les exemples précédents, il est relativement simple de se
+convaincre que deux normes équivalentes donnent des suites de mêmes
+natures, les mêmes fonctions continues et les mêmes comparaisons.
+\begin{question}
+  Montrer que les normes $1$, $2$ et $\infty$ sont équivalentes.
+\end{question}
+\begin{thm}
+  Toutes les normes sur $\R^n$ sont équivalentes.
+\end{thm}
+\begin{rem}
+  La preuve de ce théorème est en dehors du périmètre de ce
+  cours. Elle nécessite certaines notions de topologie qui vous
+  manquent ; notamment la notion de compacité. On se contentera du
+  résultat.
+\end{rem}
+Le fait que les normes soient équivalentes en terme de questionnement
+topologique (les études des phénomènes locaux) ne signifie pas
+qu'utiliser l'une ou l'autre en modélisation revient au même.
+\begin{question}
+  Quelles normes utiliseriez-vous pour modéliser les problématiques
+  suivantes:
+  \begin{enumerate}
+  \item Le calcul de la distance que doit parcourir un oiseau entre
+    deux coordonnées GPS pas trop éloignées.
+  \item Le calcul de la distance que parcours un touriste à Manhattan
+    entre deux musée.
+  \item Le calcul du nombre de modifications nécessaires (lettre à
+    lettre) pour changer un mot en un autre.
+  \end{enumerate}
+\end{question}
+
+\section{Différentiabilité et différentielle en un point}
+\label{sec:diffetdiff}
+
+Cette série de questions est calculatoire. Savoir calculer la
+différentielle, le gradient (plus généralement la jacobienne) ou la
+dérivée directionnelle d'une fonction à plusieurs variables en tout
+point (ou du moins là où cela fait sens) est nécessaire.
+
+\begin{question}
+  Calculer la différentielle de l'application sur $\R$,
+  $f(x) = \frac{\sin(x)}{x^2+1}$ en tout point $x$. Quelle est la
+  différence avec la dérivée de $f$.
+\end{question}
+
+\begin{question}
+  Calculer la différentielle des fonctions suivantes:
+  \begin{enumerate}
+  \item $f :\R^n \rightarrow \R$ donnée par l'expressoin
+    $X \mapsto X^TAX$ ; , où $A$ est une matrice carrée de taille
+    $(n, n)$ ;
+  \item $g : \R^n \rightarrow \R$ donnée par l'expression
+    $X \mapsto 1/(X^TX + 1)$.
+  \item $f : \R^n \rightarrow \R$ donnée par l'expressoin
+    $X \mapsto \cos^2(X^TAX)$, où $A$ est une matrice carrée de taille
+    $(n, n)$ ;
+  \item $g : M_n(\R) \rightarrow \R$ donnée par
+    $A \mapsto \mathrm{tr}(A)^2$ ;
+  \item $h : \mc{M}_n(\R) \rightarrow \mc{M}_n(\R)$ donnée par
+    l'expression $B \mapsto \mathrm{tr}(AB)B$ où $A$ est une matrice
+    carrée de taille $(n, n)$.
+  \end{enumerate}
+\end{question}
+
+\begin{question}
+  On considère la fonction définie sur $\R^2$ par
+  $f(x, y) = \frac{x^2\cos(y)}{y + \sin^2(x) + 1}$. Pour tout
+  $\vartheta \in \R$ on désigne par $w_\vartheta$ le vecteur
+  $(\vartheta, \vartheta^2)$.
+  \begin{enumerate}
+  \item Calculer la dérivée directionnelle $\pa_{w_\vartheta}f(0, 0)$
+    en fonction de $\vartheta$ ;
+  \item Étudier cette fonction de $\vartheta$.
+  \item Pouvez-vous interpréter vos résultats géométriquement?
+  \end{enumerate}
+\end{question}
+
+\begin{question}
+  Expliciter le gradient, en tout point ou cela fait sens, des
+  expressions différentiables suivantes :
+  \begin{enumerate}
+  \item $f(x, y) = e^{xy}(x+y)$ ;
+  \item $g(x, y, z) = (x + y\ln(z), xyz)$ ;
+  \item $h(x, y, z) = \left(\dfrac{x^2\sin(xy)}{z^2 + 2}, \tan(xyz)\right)$ ;
+  \item $f(x, y, z) = \dfrac{x + y + z}{x+y^2+1}$ ;
+  \item $g(x, y) = \dfrac{\cos(xy)}{\sqrt{x^2 + y^2}}$ ;
+  \item $h(x, y, z) = \exp(xy - z)$.
+  \end{enumerate}
+\end{question}
+
+\begin{question}
+  Soit $f : \R^3 \to \R$ une fonction différentiable en tout point de
+  $\R^3$. On considère la fonction $g : \R^3 \to \R$ donnée pour tout
+  $(x, y, z) \in \R^3$ par
+  \[
+  g(x, y, z) = f(x-y, y-z, z-x).
+  \]
+  La fonction $g$ est différentiable en tout point car composée de
+  fonction différentiables. Montrer qu'on a la relation
+  \[
+  \frac{\pa g}{\pa x}(a,b, c) + \frac{\pa g}{\pa y}(a, b, c) + \frac{\pa
+    g}{\pa z}(a, b, c) = 0
+  \]
+  pour tout point $(a, b, c) \in \R^3$.
+\end{question}
+
+\subsection{Interprétations géométriques}
+\label{sec:interprétationsgeoms}
+
+\begin{question}
+  Trouver les points sur le paraboloïde $z = 4x^2 + y^2$ où le plan
+  tangent est parallèle au plan $x + 2y + z = 6$. Faire de même avec le plan
+  $3x + 5y -2z = 5$.
+\end{question}
+
+\begin{question}
+  Un étudiant malheureux trouve pour plan tangent à la surface donnée
+  par $z = x^4-y^2$ au point $(2, 3, 7)$ la réponse
+  \[
+  z = 4x^3(x-2) - 2y(y-3) + 7.
+  \]
+  \begin{enumerate}
+  \item Sans calcul, pourquoi est-ce faux?
+  \item Donner la réponse correcte.
+  \item D'où venait la confusion de l'étudiant?
+  \end{enumerate}
+\end{question}
+
+\subsection{Optimiser, toujours}
+
+On revient sur les problèmes d'optimisation qu'on est désormais en
+mesure d'optimiser à l'aide des outils de calcul différentiel abordés.
+\begin{question}
+On considère la fonction différentiable $f : \R^2 \to \R$ donnée par
+\[
+f(x, y) = 3x^2 + y^2.
+\]
+\begin{enumerate}
+\item Représenter les courbes de niveaux $2$ et $4$ de $f$ dans le
+  plan euclidien.
+\item À quel lieu correspond la condition $f(x, y) \leq 4$ ?
+\item On s'intéresse au problème d'optimisation (\emph{P4})
+  \[
+  \begin{PbOptim}{
+      minimiser
+    }{
+      $2x + y$
+    }{
+      $3x^2 + y^2 \leq 4$
+    }
+  \end{PbOptim}
+  \]
+  Représenter la courbe de niveau de la fonction objectif qui
+  correspond à la valeur optimale de (\emph{P4}).
+\item Comment trouver le point optimale correspondant à (\emph{P4})?
+  Faire le calcul.
+\end{enumerate}
+\end{question}
+
+\begin{question}
+  On considère le problème d'optimisation (\emph{P5}) suivant
+  \[
+    \begin{PbOptim}{
+        minimiser
+      }{
+        $x + y$
+      }{
+        $\begin{matrix}
+          x+2y \leq 3 \\
+          x \in B
+        \end{matrix}$
+      }
+    \end{PbOptim}
+  \]
+  où $B$ est la partie de $\R^2$ intersection de l'épigraphe de la
+  fonction $x \mapsto -\sqrt{x}$ sur $\R_+$ et de la partie
+  \[
+    \left\{(x, y) \mid y \leq \sqrt{x}\right\}.
+  \]
+  \begin{enumerate}
+  \item Dessiner le lieu admissible du problème de (\emph{P5}).
+  \item Représenter la courbe de niveau de la fonction objective qui
+    réalise le minimum de (\emph{P5}).
+  \item Calculer le point optimal ainsi que la valeur optimale de
+    (\emph{P5}).
+  \end{enumerate}
+\end{question}
+
+\section{Lagrangien et conditions KKT}
+\label{sec:lagrangien}
+
+On applique dans la suite la démarche KKT pour résoudre des problèmes
+d'optimisation plus délicat à résoudre géométriquement.
+
+\subsection{Des problèmes simples}
+
+\begin{question}
+  Résoudre le problème d'optimisation
+  \[
+  \begin{linearProg}{
+      minimiser
+    }{
+      $x^2 -14x + y^2 - 6y - 7$
+    }{
+      \systeme{
+        x + y \leq 2,
+        x + 2y \leq 3
+      }
+    }
+  \end{linearProg}
+  \]
+\end{question}
+
+\begin{question}
+  Une ressource disponible en quantité d doit être affectée à trois
+  activités en quantités $x_1$ , $x_2$ et $x_3$
+  respectivement. L’allocation de $x_k$ unités de ressource à
+  l’activité $k$ procure une recette évaluée par
+  $f_k(x_k) = 8x_k - k{x_k}^2$. Calculer l'allocation qui procure la
+  plus grande recette dans les deux éventualités suivantes:
+  \begin{enumerate}
+  \item la quantité $d$ est complètement utilisée ;
+  \item l'excédant quand $d$ n'est pas épuisé est revendu au prix $p$.
+  \end{enumerate}
+  A-t-on intérêt à utiliser toutes les ressources disponibles?
+\end{question}
+
+\subsection{Un problème débile}
+
+Une entreprise fabrique deux modèles de clés USB, les modèles $X$ et
+$Y$. Le modèle $X$ se vend à $1$\euro{} pièce, le modèle $Y$ se vend pour
+sa part à $3$\euro{} pièce. Le coût de fabrication en \euro{} est donné par
+l'expression :
+\[
+C(x, y) = 5x^2 + 5y^2 - 2xy - 2x - 1000.
+\]
+où $x$ est le nombre de clés USB de type $X$ et $y$ celui de type
+$Y$. On suppose que toutes les clés USB ont été toutes écoulées sur le
+marché.
+
+\begin{question}{6}
+  \begin{enumerate}
+  \item Soit $(x, y) \in (\R_+^*)^2$. Déterminer le profit $P(x, y)$
+    réalisé par l’entreprise lorsqu’elle a vendu $x$ clés de modèle $X$
+    et $y$ clés de modèle $Y$.
+  \item Étudier la convexité de la fonction de profit $P$ sur
+    $(\R_+^*)^2$. Vous pouvez vous aider de la hessienne de $P$ en
+    tout point.
+  \item La capacité de production de l’entreprise est au total de $20$
+    clés par jour\footnote{C'est des clés fait main!}. Décrire le
+    problème de maximisation du profit de l'entreprise comme un
+    problème d'optimisation convexe.
+  \item En supposant que l’entreprise tourne à plein régime, trouver
+    la répartition optimale entre les modèles de type $X$ et $Y$
+    permettant de maximiser le profit quotidien. Calculer dans ce cas
+    le profit réalisé. \textit{Vous êtes invités, en un premier temps,
+      à ne pas tenir compte des contraintes de positivité de $x$ et
+      $y$.}
+  \item Pourquoi peut-on se dispenser des contraintes de positivité ?
+  \end{enumerate}
+\end{question}
+
+\subsection{Un problème géométrique}
+
+\begin{question}
+  \begin{enumerate}
+  \item
+    Déterminer le rectangle de plus grande surface inscrit dans
+    l'ellipse d'équation
+    \[
+    \frac{x^2}{a} + \frac{y^2}{b} = 1.
+    \]
+  \item
+    Faire de même avec le parallélépipède de plus grand volume inscrit
+    dans l'ellipsoïde d'équation
+    \[
+    \frac{x^2}{a} + \frac{y^2}{b} + \frac{z^2}{c} = 1.
+    \]
+  \end{enumerate}
+\end{question}
+
+\section{Hessienne d'une fonction}
+\label{sec:hessienne}
+
+Dans cette section, on revient sur un point laissé de côté lors du
+cours: vous avez su lors de vos études secondaires étudier les types
+de point critiques que vous obteniez par l'annulation de la dérivée
+d'une fonction numérique à l'aide de la dérivée seconde. Cette
+démarche s'étend au cas des dimensions supérieures. Pour cela il nous
+faut généraliser la notion de dérivée seconde.
+\begin{defn}
+  Soit $f : \R^n \to \R$ une fonction différentiable en tout point de
+  son domaine de différentielle continue. On dit que $f$ est $2$-fois
+  différentiable en un point $a$ du domaine de $f$ si le $\nabla f$
+  est différentiable. Dans cas on appelle \emph{hessienne} de $f$ en
+  $a$ la jacobienne de $\nabla f$. Elle est notée $\nabla^2 f(a)$.
+\end{defn}
+On regroupe les notations des coefficients de la matrice hessienne ;
+on écrira
+\[
+  \frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial
+    x}\left(\frac{\partial f}{\partial x}\right)
+\]
+et
+\[
+  \frac{\partial^2 f}{\partial x\partial y} = \frac{\partial}{\partial
+    x}\left(\frac{\partial f}{\partial y}\right).
+\]
+Quand elle existe et \textit{quand ses composantes sont continues}, la
+hessienne d'une fonction $f$ en un point $(a, b)$ définit une forme
+quadratique\footnote{Théorème de Schwarz} qu'on appelle
+\emph{différentielle seconde} de $f$ en $(a, b)$. Elle donne une
+approximation du second ordre de $f$ au voisinage de $(a, b)$.  La
+hessienne permet une étude plus fine des points critiques de la
+fonction $f$ ainsi qu'une caractérisation pratique des conditions de
+convexité de celle-ci.
+\begin{prop}
+  Soit $f : U \to \R^m$ une application $2$ fois différentiable en un
+  point $a$ de l'ouvert $U$. Alors pour $h$ assez petit
+  \begin{equation}
+    \label{eq:DL2}
+    f(a+h) = f(a) + \nabla f(a) h + \dfrac{1}{2} h^T\nabla^2f(a)h  + o_{\underline{0}}(\|h\|^2).
+  \end{equation}.
+\end{prop}
+\begin{question}
+  Soient $f : \R \to \R$ une fonction $2$-fois dérivable et $P$ une
+  matrice symétrique.  Quelle est la différentielle seconde, en tout
+  point, de l'application $f_P$ définie sur $\R^n$ par
+  $x \mapsto f(x^TPx)$ ?
+\end{question}
+\begin{question}
+  \label{eq:hessienne}
+  Calculer les hessiennes en tout point des fonctions à valeurs
+  réelles suivantes:
+  \begin{enumerate}
+  \item $f(x, y) = x^2 + xy + y^2 + \displaystyle{\frac{x^3}{4}}$;
+  \item $f(x, y) = x^3 + y^3$;
+  \item $f(x, y) = x^2y - \displaystyle{\frac{x^2}{2}} - y^2$;
+  \item $f(x, y, z) = x^2 + 3y^2 - z^2 + 2xy - 5yz$;
+  \item $f(x, y, z) = \ln\big(e^x + e^y +e^z\big)$.
+  \end{enumerate}
+\end{question}
+
+\subsection{Convexité}
+
+Soit $f : U \to \R$ une fonction définie et différentiable sur un ouvert convexe
+$U \subset \R^n$. Alors $f$ est convexe si et seulement si
+\begin{equation}
+  \label{eq:convexeOrdUn}
+  \forall x, y \in U, \quad f(x) - f(y) \geq \nabla{f}(x)(x-y).
+\end{equation}
+On rappelle que ce critère \eqref{eq:convexeOrdUn} a une
+interprétation géométrique simple: l'hyperplan tangent au graphe de
+$f$ en un point $(x, f(x))$ est un hyperplan d'appui. En effet, cette
+dernière condition se traduit en un point $x \in U$ par
+\[
+(\nabla{f}(x), -1)  \begin{pmatrix}  y - x \\ f(y) - f(x) \end{pmatrix} \leq 0
+\]
+qui donne, une fois la multiplication matricielle explicitée, la
+relation \eqref{eq:convexeOrdUn}. On rappelle que le vecteur
+$(\nabla{f}(x), -1)$ est un vecteur normal définissant l'hyperplan
+tangent au graphe de $f$ au point $(x, f(x))$. Notez au passage le fait
+que $\nabla{f}(x)$, $x$ et $y$ sont des vecteurs dans $\R^n$ ;
+l'écriture ci-dessus est donc une écriture par blocs.
+
+Ce critère d'ordre $1$ est pratique mais pas toujours facile à
+manier. Quand $f$ est une fonction $2$ fois différentiable, tout comme
+dans le cas d'une fonction de $\R$ dans $\R$, la positivité de la
+différentielle seconde nous apporte une information sur la convexité
+de $f$. Plus précisément:
+\begin{prop}
+  Soit $f : U \to \R$ une fonction $2$ fois différentiable définie sur
+  un ouvert convexe $U \subset \R^n$. Alors $f$ est convexe si et
+  seulement si
+  \begin{equation}
+    \label{eq:convexeOrdDeux}
+    \forall x \in U, \quad \nabla^2{f}(x) \geq 0.
+  \end{equation}
+\end{prop}
+
+Ainsi, un point critique d'une fonction convexe ne peut être qu'un
+minimum local, donc global. Les autres cas de figures sont ceux d'un
+maximum local (si la hessienne est négative) ou d'un \emph{point
+  selle} quand la hessienne n'est négative ni positive.
+
+\begin{question}
+  Les fonction de la question \eqref{eq:hessienne} sont-elles convexes ?
+  Justifier.
+\end{question}
+
+
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
